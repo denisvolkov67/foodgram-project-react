@@ -1,61 +1,48 @@
-from django.shortcuts import get_object_or_404
+from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreateSerializer, UserSerializer
 from rest_framework import serializers
-from rest_framework.exceptions import ValidationError
-from rest_framework.validators import UniqueTogetherValidator, UniqueValidator
+from rest_framework.validators import UniqueValidator
 
-from .models import User
+from users.models import Follow
+
+User = get_user_model()
 
 
-
-class AbstractUserSerializer(serializers.ModelSerializer):
-    username = serializers.RegexField(
-        r'^[\w.@+-]',
-        max_length=150,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
+class CustomUserCreateSerializer(UserCreateSerializer):
     email = serializers.EmailField(
-        max_length=254,
-        validators=[UniqueValidator(queryset=User.objects.all())],
-    )
-
-
-class UserSerializer(AbstractUserSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "email",
-            "username",
-            "id",
-            "first_name",
-            "last_name",
-            "is_subscribed",
-        )
-
-
-class LoginSerializer(AbstractUserSerializer):
-    class Meta:
-        model = User
-        fields = (
-            "username",
-            "email",
-        )
-
-    def validate(self, attrs):
-        if attrs["username"] == "me":
-
-            raise serializers.ValidationError(
-                "Нельзя использовать 'me' в качестве username!"
-            )
-        return attrs
-
-
-class LogoutSerializer(serializers.ModelSerializer):
-    username = serializers.CharField()
-    confirmation_code = serializers.CharField()
+        validators=[UniqueValidator(queryset=User.objects.all())])
+    username = serializers.CharField(
+        validators=[UniqueValidator(queryset=User.objects.all())])
 
     class Meta:
         model = User
         fields = (
-            "username",
-            "confirmation_code",
+            'id',
+            'email',
+            'username',
+            'first_name',
+            'last_name',
+            'password',
         )
+        extra_kwargs = {
+            'email': {'required': True},
+            'username': {'required': True},
+            'first_name': {'required': True},
+            'last_name': {'required': True},
+            'password': {'required': True},
+        }
+
+
+class CustomUserSerializer(UserSerializer):
+    is_subscribed = serializers.SerializerMethodField()
+
+    class Meta:
+        model = User
+        fields = ('id', 'first_name', 'last_name', 'username', 'email',
+                  'is_subscribed')
+
+    def get_is_subscribed(self, obj):
+        user = self.context.get('request').user
+        if user.is_anonymous:
+            return False
+        return Follow.objects.filter(user=user, author=obj.id).exists()

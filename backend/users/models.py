@@ -1,12 +1,28 @@
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth import get_user_model
 from django.db import models
 
+User = get_user_model()
 
-class User(AbstractUser):
-    is_subscribed = models.BooleanField(
-        verbose_name="Состояние подписки",
-        default=False,
+
+class Follow(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='follower',
+        verbose_name='Подписчик',
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='following',
+        verbose_name='Автор',
     )
 
-    def __str__(self):
-        return self.username
+    class Meta:
+        verbose_name = 'Подписка'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['user', 'author'],
+                name='unique follow',
+            )
+        ]

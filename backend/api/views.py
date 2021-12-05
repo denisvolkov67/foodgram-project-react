@@ -1,49 +1,28 @@
-from rest_framework import filters, mixins, viewsets
+from rest_framework import viewsets
 
 from api.serializers import (
     IngredientSerializer,
     RecipeSerializer,
     TagSerializer
 )
+from api.permissions import IsAdminOrReadOnly, IsOwnerOrReadOnly
 from recipes.models import Ingredient, Recipe, Tag
 
 
-class BaseModelViewSet(
-    mixins.ListModelMixin,
-    mixins.CreateModelMixin,
-    mixins.DestroyModelMixin,
-    viewsets.GenericViewSet,
-):
-    pass
-
-
-class ListRetrieveViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet,
-):
-    pass
-
-
-class IngredientViewSet(ListRetrieveViewSet):
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Ingredient.objects.all()
     serializer_class = IngredientSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ("name",)
-    lookup_field = "id"
+    search_fields = ('name',)
 
 
-class TagViewSet(ListRetrieveViewSet):
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    permission_classes = (IsAdminOrReadOnly,)
     queryset = Tag.objects.all()
     serializer_class = TagSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ("name",)
-    lookup_field = "id"
 
 
 class RecipeViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsOwnerOrReadOnly]
     queryset = Recipe.objects.all()
     serializer_class = RecipeSerializer
-    filter_backends = [filters.SearchFilter]
-    search_fields = ("name",)
-    lookup_field = "id"

@@ -1,6 +1,9 @@
+from colorfield.fields import ColorField
+from django.contrib.auth import get_user_model
+from django.core import validators
 from django.db import models
 
-from users.models import User
+User = get_user_model()
 
 
 class Ingredient(models.Model):
@@ -12,11 +15,11 @@ class Ingredient(models.Model):
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=200, verbose_name="Название")
-    color = models.CharField(max_length=7, verbose_name="Цвет в HEX")
+    name = models.CharField(max_length=200, verbose_name='Название')
+    color = ColorField('Цвет в HEX', default='#00FF00')
     slug = models.SlugField(
         max_length=200,
-        verbose_name="Уникальный слаг",
+        verbose_name='Уникальный slug',
         unique=True
     )
 
@@ -27,7 +30,7 @@ class Tag(models.Model):
 class Recipe(models.Model):
     name = models.CharField(max_length=200, null=True)
     author = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="recipes", null=True
+        User, on_delete=models.CASCADE, related_name='recipes', null=True
     )
     text = models.TextField(null=True)
     cooking_time = models.PositiveIntegerField()
@@ -37,6 +40,10 @@ class Recipe(models.Model):
         through='IngredientRecipe'
     )
     tags = models.ManyToManyField(Tag)
+    cooking_time = models.PositiveSmallIntegerField(
+        validators=(
+            validators.MinValueValidator(
+                1, message='Минимальное время приготовления 1 минута'),))
 
     def __str__(self):
         return self.name
@@ -45,4 +52,36 @@ class Recipe(models.Model):
 class IngredientRecipe(models.Model):
     ingredient = models.ForeignKey(Ingredient, on_delete=models.CASCADE)
     recipe = models.ForeignKey(Recipe, on_delete=models.CASCADE)
-    value = models.PositiveIntegerField()
+    amount = models.PositiveIntegerField()
+
+    def __str__(self):
+        return str(self.ingredient)
+
+
+class Cart(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='cart',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='cart',
+    )
+
+    def __str__(self):
+        return '{}, {}'.format(self.user.username, self.recipe.name)
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='favorites',
+    )
+    recipe = models.ForeignKey(
+        Recipe,
+        on_delete=models.CASCADE,
+        related_name='favorites',
+    )

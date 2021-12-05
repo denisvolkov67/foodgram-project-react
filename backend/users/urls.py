@@ -1,13 +1,17 @@
 from django.urls import include, path
-from rest_framework import routers
+from djoser import views
+from rest_framework.routers import DefaultRouter
 
-from .views import (UserViewSet)
+from .views import CustomUserViewSet
 
-v1_router = routers.DefaultRouter()
-v1_router.register(r"users", UserViewSet, "users")
-# v1_router.register(r"auth/token/login", LoginViewSet, "login")
-# v1_router.register(r"auth/token/logout", LogoutViewSet, "logout")
+app_name = 'api'
+
+router = DefaultRouter()
+router.register('users', CustomUserViewSet, basename='users')
 
 urlpatterns = [
-    path("", include(v1_router.urls)),
+    path('', include(router.urls)),
+    path('auth/token/login/', views.TokenCreateView.as_view(), name='login'),
+    path('auth/token/logout/', views.TokenDestroyView.as_view(),
+         name='logout'),
 ]
