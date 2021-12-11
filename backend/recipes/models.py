@@ -34,7 +34,7 @@ class Recipe(models.Model):
     )
     text = models.TextField(null=True)
     cooking_time = models.PositiveIntegerField()
-    # image=
+    image = models.ImageField(null=True, upload_to='recipes/')
     ingredients = models.ManyToManyField(
         Ingredient,
         through='IngredientRecipe'
