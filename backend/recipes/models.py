@@ -136,7 +136,7 @@ class Favorite(models.Model):
         related_name='favorites',
         verbose_name='Рецепт',
     )
-    
+
     class Meta:
         ordering = ['-id']
         verbose_name = 'Избранное'

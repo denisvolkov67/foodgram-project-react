@@ -63,7 +63,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         """Скачать список покупок."""
         user = request.user
         return generate_pdf_shopping_list(user)
-        
+
     def add_obj(self, model, user, pk):
         if model.objects.filter(user=user, recipe__id=pk).exists():
             return Response({
