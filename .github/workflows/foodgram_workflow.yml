@@ -24,6 +24,7 @@ jobs:
 
     - name: Test with flake8 and django tests
       run: |
+        cd backend
         python -m flake8
 
   build_backend:
