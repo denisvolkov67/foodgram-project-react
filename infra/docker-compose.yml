@@ -15,9 +15,7 @@ services:
       - ../.env
 
   web:
-    build:
-      context: ../backend
-      dockerfile: Dockerfile
+    image: denisvolkov67/foodgram_backend:latest
     restart: unless-stopped
     env_file:
       - ../.env
@@ -28,9 +26,7 @@ services:
       - media_value:/app/media/
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: Dockerfile
+    image: denisvolkov67/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
