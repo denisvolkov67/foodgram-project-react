@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 volumes:
   postgres_data:
@@ -29,8 +29,6 @@ services:
     image: denisvolkov67/foodgram_frontend:latest
     volumes:
       - ../frontend/:/app/result_build/
-    depends_on:
-      - web
 
   nginx:
     image: nginx:1.19.3
@@ -45,3 +43,4 @@ services:
       - media_value:/var/html/media/
     depends_on:
       - frontend
+      - web
