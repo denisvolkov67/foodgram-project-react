@@ -87,10 +87,10 @@ jobs:
         passphrase: ${{ secrets.PASSPHRASE }}
         
         script: |
-          sudo cd foodgram
+          cd foodgram
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_backend:latest
           sudo docker pull ${{ secrets.DOCKER_USERNAME }}/foodgram_frontend:latest
-          sudo cd infra
+          cd infra
           sudo docker-compose stop
           sudo docker-compose rm -f backend --build
           touch .env
