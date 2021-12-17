@@ -99,7 +99,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
 
     def validate(self, data):
-        tags = self.data.get("tags")
+        tags = self.initial_data.get("tags")
         if not tags:
             raise serializers.ValidationError(
                 "Убедитесь, что добавлен хотя бы один тег"
@@ -108,7 +108,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Теги должны быть уникальными")
         data["tags"] = tags
 
-        ingredients = self.data.get("ingredients")
+        ingredients = self.initial_data.get("ingredients")
         if not ingredients or len(ingredients) < 1:
             raise serializers.ValidationError(
                 "Нужен хоть один ингредиент для рецепта"
@@ -129,7 +129,7 @@ class RecipeSerializer(serializers.ModelSerializer):
                 )
         data["ingredients"] = ingredients
 
-        cooking_time = self.data.get("cooking_time")
+        cooking_time = self.initial_data.get("cooking_time")
         if not int(cooking_time) > 0:
             raise serializers.ValidationError(
                 "Убедитесь, что время приготовления больше нуля"
