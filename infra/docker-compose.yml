@@ -15,7 +15,10 @@ services:
       - ../.env
 
   web:
-    image: denisvolkov67/foodgram_backend:latest
+    # image: denisvolkov67/foodgram_backend:latest
+    build:
+      context: ../backend
+      dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
       - ../.env
