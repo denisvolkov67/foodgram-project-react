@@ -35,6 +35,8 @@ def generate_pdf_shopping_list(user):
         height -= 30
         if height <= 40:
             page.showPage()
+            height = 800
+            page.setFont('DejaVuSerif', 16)
             is_page_done = True
     if not is_page_done:
         page.showPage()
